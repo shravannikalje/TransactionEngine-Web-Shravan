@@ -1,0 +1,6 @@
+{
+  "deploy": {
+    "builder": "dockerfile",
+    "buildCommand": "mvn clean package -f backend/pom.xml -DskipTests"
+  }
+}

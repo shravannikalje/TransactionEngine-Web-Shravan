@@ -1,0 +1,11 @@
+node_modules/
+target/
+.classpath
+.project
+.settings/
+*.class
+*.jar
+.DS_Store
+.env
+dist/
+build/
