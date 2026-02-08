@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Engine - Banking System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💳 Transaction Engine</h1>
+            <p>Banking Transaction Management System</p>
+        </header>
+
+        <main>
+            <!-- Add Transaction Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Add New Transaction</h2>
+                </div>
+                <form id="transactionForm" class="form">
+                    <div class="form-group">
+                        <label for="transactionId">Transaction ID:</label>
+                        <input type="text" id="transactionId" name="transactionId" placeholder="e.g., TXN001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount:</label>
+                        <input type="number" id="amount" name="amount" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Transaction Type:</label>
+                        <select id="type" name="type" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="Deposit">Deposit</option>
+                            <option value="Withdrawal">Withdrawal</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="Payment">Payment</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Transaction</button>
+                </form>
+            </section>
+
+            <!-- Transactions List Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>All Transactions</h2>
+                    <button id="refreshBtn" class="btn btn-secondary">🔄 Refresh</button>
+                </div>
+                <div id="transactionsList" class="transactions-list">
+                    <p class="empty-state">No transactions yet. Add one to get started!</p>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Statistics</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Transactions</h3>
+                        <p class="stat-value" id="totalCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Deposits</h3>
+                        <p class="stat-value" id="depositCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Withdrawals</h3>
+                        <p class="stat-value" id="withdrawalCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Amount</h3>
+                        <p class="stat-value" id="totalAmount">$0.00</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clear All Section -->
+            <section class="section">
+                <button id="clearAllBtn" class="btn btn-danger">Clear All Transactions</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Transaction Engine. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Sample transactions data
+        const sampleTransactions = [
+            { id: 'TXN001', amount: 5000.00, type: 'Deposit' },
+            { id: 'TXN002', amount: 1200.50, type: 'Withdrawal' },
+            { id: 'TXN003', amount: 3500.75, type: 'Transfer' },
+            { id: 'TXN004', amount: 250.00, type: 'Payment' }
+        ];
+
+        // Function to initialize sample transactions
+        function initializeSampleTransactions() {
+            sampleTransactions.forEach(transaction => {
+                addTransactionToDOM(transaction);
+            });
+            updateStatistics();
+        }
+
+        // Function to add a transaction to the DOM
+        function addTransactionToDOM(transaction) {
+            const transactionsList = document.getElementById('transactionsList');
+            const transactionElement = document.createElement('div');
+            transactionElement.classList.add('transaction-item');
+            transactionElement.innerHTML = `
+                <span class="transaction-id">${transaction.id}</span>
+                <span class="transaction-amount">$${transaction.amount.toFixed(2)}</span>
+                <span class="transaction-type">${transaction.type}</span>
+            `;
+            transactionsList.appendChild(transactionElement);
+        }
+
+        // Function to update statistics
+        function updateStatistics() {
+            const totalCount = document.getElementById('totalCount');
+            const depositCount = document.getElementById('depositCount');
+            const withdrawalCount = document.getElementById('withdrawalCount');
+            const totalAmount = document.getElementById('totalAmount');
+
+            totalCount.innerText = sampleTransactions.length;
+            depositCount.innerText = sampleTransactions.filter(t => t.type === 'Deposit').length;
+            withdrawalCount.innerText = sampleTransactions.filter(t => t.type === 'Withdrawal').length;
+            const total = sampleTransactions.reduce((sum, t) => sum + t.amount, 0);
+            totalAmount.innerText = `$${total.toFixed(2)}`;
+        }
+
+        // Initialize sample transactions on page load
+        window.onload = () => {
+            initializeSampleTransactions();
+        };
+    </script>
+</body>
+</html>
