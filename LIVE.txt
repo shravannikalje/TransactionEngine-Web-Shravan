@@ -1,0 +1,24 @@
+⭐ **TRANSACTION ENGINE - LIVE & READY** ⭐
+
+═══════════════════════════════════════════════════════════════
+
+🌐 **FRONTEND (Web App)**
+https://shravannikalje.github.io/TransactionEngine-Web-Shravan
+
+⚙️ **BACKEND (Java API)**
+https://transactionengine-shravan.railway.app
+
+📁 **SOURCE CODE (GitHub)**
+https://github.com/shravannikalje/TransactionEngine-Web-Shravan
+
+═══════════════════════════════════════════════════════════════
+
+✅ Frontend: Live on GitHub Pages
+✅ Backend: Live on Railway
+✅ Code: Complete & Documented
+✅ Ready to Use!
+
+📖 **For detailed info:** See LIVE_LINKS.md
+📖 **For deployment:** See DEPLOYMENT_GUIDE.md
+
+═══════════════════════════════════════════════════════════════
