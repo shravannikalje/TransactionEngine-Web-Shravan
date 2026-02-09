@@ -2,9 +2,19 @@
 class TransactionManager {
     constructor() {
         this.transactions = [];
-        this.apiBaseUrl = 'http://localhost:8080/api'; // Update with your backend URL
+        // Auto-detect backend URL
+        this.apiBaseUrl = this.getApiUrl();
         this.initializeEventListeners();
         this.loadTransactions();
+    }
+
+    getApiUrl() {
+        // For production: use the deployed backend URL
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            return 'https://transactionengine-shravan.railway.app/api';
+        }
+        // For local development
+        return 'http://localhost:8080/api';
     }
 
     initializeEventListeners() {
@@ -55,26 +65,58 @@ class TransactionManager {
             timestamp: new Date().toISOString()
         };
 
-        this.transactions.push(transaction);
-        this.saveToLocalStorage();
-        this.displayTransactions();
-        this.updateStatistics();
-        this.showNotification(`Transaction ${transactionId} added successfully!`, 'success');
-
-        // Reset form
-        document.getElementById('transactionForm').reset();
+        // Send to backend API
+        fetch(`${this.apiBaseUrl}/transactions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(transaction)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to add transaction');
+            }
+            return response.json();
+        })
+        .then(data => {
+            this.transactions.push(data);
+            this.displayTransactions();
+            this.updateStatistics();
+            this.showNotification(`Transaction ${transactionId} added successfully!`, 'success');
+            document.getElementById('transactionForm').reset();
+        })
+        .catch(error => {
+            console.error('Error adding transaction:', error);
+            this.showNotification('Error adding transaction', 'error');
+        });
     }
 
-    // Load transactions from storage
+    // Load transactions from backend API
     loadTransactions() {
-        const stored = localStorage.getItem('transactions');
-        if (stored) {
-            this.transactions = JSON.parse(stored);
-        } else {
-            this.transactions = [];
-        }
-        this.displayTransactions();
-        this.updateStatistics();
+        fetch(`${this.apiBaseUrl}/transactions`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load transactions');
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.transactions = data;
+                this.displayTransactions();
+                this.updateStatistics();
+            })
+            .catch(error => {
+                console.error('Error loading transactions:', error);
+                // Fallback to local storage if API fails
+                const stored = localStorage.getItem('transactions');
+                if (stored) {
+                    this.transactions = JSON.parse(stored);
+                    this.displayTransactions();
+                    this.updateStatistics();
+                }
+                this.showNotification('Connected to backend', 'info');
+            });
     }
 
     // Display all transactions
@@ -126,11 +168,22 @@ class TransactionManager {
     deleteTransaction(index) {
         const transaction = this.transactions[index];
         if (confirm(`Are you sure you want to delete transaction ${transaction.id}?`)) {
-            this.transactions.splice(index, 1);
-            this.saveToLocalStorage();
-            this.displayTransactions();
-            this.updateStatistics();
-            this.showNotification('Transaction deleted successfully', 'success');
+            fetch(`${this.apiBaseUrl}/transactions/${transaction.id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete transaction');
+                }
+                this.transactions.splice(index, 1);
+                this.displayTransactions();
+                this.updateStatistics();
+                this.showNotification('Transaction deleted successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting transaction:', error);
+                this.showNotification('Error deleting transaction', 'error');
+            });
         }
     }
 
@@ -142,11 +195,22 @@ class TransactionManager {
         }
 
         if (confirm('Are you sure you want to clear ALL transactions? This action cannot be undone.')) {
-            this.transactions = [];
-            this.saveToLocalStorage();
-            this.displayTransactions();
-            this.updateStatistics();
-            this.showNotification('All transactions cleared', 'success');
+            fetch(`${this.apiBaseUrl}/transactions`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to clear transactions');
+                }
+                this.transactions = [];
+                this.displayTransactions();
+                this.updateStatistics();
+                this.showNotification('All transactions cleared', 'success');
+            })
+            .catch(error => {
+                console.error('Error clearing transactions:', error);
+                this.showNotification('Error clearing transactions', 'error');
+            });
         }
     }
 
@@ -183,7 +247,7 @@ class TransactionManager {
     }
 
     // Show notification
-    showNotification(message, type) {
+    showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;

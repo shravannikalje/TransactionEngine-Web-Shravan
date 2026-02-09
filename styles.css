@@ -391,6 +391,12 @@ footer {
     color: var(--warning-color);
 }
 
+.notification.info {
+    background: rgba(17, 103, 177, 0.1);
+    border-left: 4px solid #0066cc;
+    color: #0066cc;
+}
+
 /* Loading State */
 .loading {
     display: inline-block;
